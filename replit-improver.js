@@ -12,12 +12,14 @@
 // ==/UserScript==
 
 
+// Список работающих расширений.
 function getRunningAddons() {
     return [
         new FileNavigationShortcuts(),
         new HidePanelShortcuts(),
         new AddCopyButton(),
         new CoverPageShortcuts(),
+        // закомментируйте, если что-то не нужно
     ];
 }
 

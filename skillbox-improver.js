@@ -22,6 +22,7 @@ function getRunningAddons() {
         new HideEmptyCourses(),
         new OpenHomeworkLinkShortcuts(),
         new ExpandCoursesShortcuts(),
+        // закомментируйте, если что-то не нужно
     ];
 }
 
