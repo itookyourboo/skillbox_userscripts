@@ -105,7 +105,9 @@ class FileNavigationShortcuts extends Addon {
             if (fileName.includes("/"))
                 fileName = fileName.split("/")[1];
             $(INTERACTIVE_NODE_SELECTOR).removeClass(ACTIVE_NODE_CLASS);
-            $(`${INTERACTIVE_NODE_SELECTOR}:contains(${fileName})`).first().addClass(ACTIVE_NODE_CLASS);
+            $(INTERACTIVE_NODE_SELECTOR)
+                .filter(function() { return $(this).text() === fileName; })
+                .addClass(ACTIVE_NODE_CLASS);
         }
 
         function activateCodeScroller() { $(CODE_SCROLLER_SELECTOR).first().focus(); }
