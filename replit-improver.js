@@ -124,9 +124,9 @@ class HidePanelShortcuts extends Addon {
         const TOGGLE_PANEL_MENU_SHORTCUT = "m";
 
         // Селектор панели файлов
-        const PANEL_FILES_SELECTOR = ".css-a1aqjc";
+        const PANEL_FILES_SELECTOR = ".css-1w81921";
         // Селектор панели меню
-        const PANEL_MENU_SELECTOR = ".css-qvh5kf";
+        const PANEL_MENU_SELECTOR = ".css-1klqaz2";
 
         $(document).bind("keyup", TOGGLE_PANEL_FILES_SHORTCUT, toggleFiles);
         $(document).bind("keyup", TOGGLE_PANEL_MENU_SHORTCUT, toggleSidePanel);
