@@ -150,6 +150,10 @@ const COVER_PAGE_SHORTCUT = "alt+c";
 
 Скрипт для прокачки GitLab
 
+### DisableEmojis
+
+Отключение окошка с эмоциями при написании двоеточия.
+
 ### MergeRequestShortcuts
 
 #### MergeShortcut
