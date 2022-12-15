@@ -3,6 +3,7 @@
 - [Установка](#установка)
 - [Прокачка LMS](#skillboximprover)
 - [Прокачка Replit](#replitimprover)
+- [Прокачка GitLab](#gitlabimprover)
 
 ## Установка
 ### Tampermonkey
@@ -15,6 +16,7 @@
 1. Скопировать исходный код файлов:
    - [replit-improver.js](https://raw.githubusercontent.com/itookyourboo/skillbox_userscripts/master/replit-improver.js)
    - [skillbox-improver.js](https://raw.githubusercontent.com/itookyourboo/skillbox_userscripts/master/skillbox-improver.js)
+   - [gitlab-improver.js](https://raw.githubusercontent.com/itookyourboo/skillbox_userscripts/master/gitlab-improver.js)
 2. Добавить их в Tampermonkey по отдельности, создав новый скрипт и вставив туда код.
 
 ## SkillboxImprover
@@ -142,3 +144,34 @@ const COVER_PAGE_SHORTCUT = "alt+c";
 ```
 
 ![](assets/Replit_CoverPageShortcuts.gif)
+
+
+## GitLabImprover
+
+Скрипт для прокачки GitLab
+
+### MergeRequestShortcuts
+
+#### MergeShortcut
+
+Горячая клавиша для нажатия на кнопку Merge:
+
+```javascript
+const CLICK_MERGE_SHORTCUT = "alt+m"
+```
+
+#### OverviewShortcut (in progress)
+
+Горячая клавиша для перемещения в Overview:
+
+```javascript
+const CLICK_OVERVIEW_SHORTCUT = "alt+o";
+```
+
+#### ChangesShortcut (in progress)
+
+Горячая клавиша для перемещения в Changes:
+
+```javascript
+const CLICK_CHANGES_SHORTCUT = "alt+c";
+```
