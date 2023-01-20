@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SkillboxImprover
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.0.1
 // @description  Прокачка LMS Skillbox для проверяющих преподавателей
 // @author       wignorbo
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -22,6 +22,7 @@ function getRunningAddons() {
         new HideEmptyCourses(),
         new OpenHomeworkLinkShortcuts(),
         new ExpandCoursesShortcuts(),
+        new SingleFeed(),
         // закомментируйте, если что-то не нужно
     ];
 }
@@ -164,6 +165,92 @@ class ExpandCoursesShortcuts extends Addon {
             var currentPanel = panels.eq(mod(currentExpandedIndex + offset, panels.length));
             currentPanel.find(ACCORDION_HEADER_SELECTOR).first().click();
         }
+    }
+}
+
+class SingleFeed extends Addon {
+    name = "Единая лента для всех работ"
+    run() {
+        const HOMEWORKS_BODY_SELECTOR = ".homeworks__body";
+        const CUSTOM_HOMEWORKS = "custom_homeworks";
+
+        function getAuthHeader() {
+            return "Bearer " + localStorage.getItem("x-access-token");
+        }
+
+        function _fetch(url) {
+            return fetch(url, {
+                headers: {
+                    "X-Auth": getAuthHeader(),
+                }
+            }).then(response => response.json());
+        }
+
+        function fillZeros(number, pad) {
+            return (number + Math.pow(10, pad)).toString().slice(-pad);
+        }
+
+        function compareWorks(work1, work2) {
+            return work1.status_updated_at.localeCompare(work2.status_updated_at);
+        }
+
+        function getAllWorks(courses) {
+            let promises = [];
+            for (let course of courses) {
+                let url = `https://go.skillbox.ru/api/v3/teachers/courses/${course.id}/homeworks/?ordering=last_active_at&status=wait`
+                let promise = _fetch(url).then(works => {
+                    for (let work of works.results) {
+                        work.course_name = course.name;
+                    }
+                    return works;
+                });
+                promises.push(promise);
+            }
+            return Promise.all(promises);
+        }
+
+        function renderWorks(works) {
+            $(HOMEWORKS_BODY_SELECTOR).prepend(`<div class="${CUSTOM_HOMEWORKS} homeworks__col-list ui-sb-col-lg-9"></div>`);
+            for (let work of works) {
+                let color = work.check_status === "ok" ? "green" : work.check_status === "warning" ? "orange" : "red";
+
+                let date = new Date(work.status_updated_at);
+                let card = `<a class="homework-card__link" href="/homeworks/${work.id}" style="color: #000000;">
+                <div style="border: 1px solid #000000; padding: 15px 20px; margin-bottom: 10px; border-radius: 15px;">
+                <p>
+                <span style="font-weight: 500;">
+                ${work.course_name}
+                </span>
+                <br>
+                ${work.topic.number}. ${work.topic.name}
+                </p>
+                <p style="font-weight: 500; margin: 0px;">
+                <span style="color: ${color}">
+                ${fillZeros(date.getDate(), 2)}.${fillZeros(date.getMonth() + 1, 2)}
+                ${fillZeros(date.getHours(), 2)}:${fillZeros(date.getMinutes(), 2)}
+                </span> |
+                ${work.user.first_name} ${work.user.last_name}
+                </p>
+                </div>
+                </a>`;
+
+                $(`.${CUSTOM_HOMEWORKS}`).append(card);
+            }
+        }
+
+        function getAllCourses() {
+            const URL = "https://go.skillbox.ru/api/v3/teachers/current/courses/check-statistics/?user_homework_status=wait";
+            _fetch(URL).then(getAllWorks).then(data => {
+                let works = []
+                for (let workCouple of data) {
+                    works = [...works, ...workCouple.results];
+                }
+                works.sort(compareWorks);
+                waitForKeyElements(HOMEWORKS_BODY_SELECTOR, () => renderWorks(works));
+            });
+        }
+
+        getAllCourses()
     }
 }
 
