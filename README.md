@@ -96,6 +96,14 @@ const EXPAND_NEXT_SHORTCUT = "alt+down";
 
 ![](assets/Skillbox_ExpandCoursesShortcuts.gif)
 
+### SinglePage
+
+Единая лента для всех домашних работ, отсортированных по времени их отправки.
+
+Поддерживается комбинация Ctrl+ArrRight для быстрого перехода к первой работе.
+
+![](assets/Skillbox_SinglePage.jpg)
+
 ## ReplitImprover
 
 Скрипт для прокачки Replit.
