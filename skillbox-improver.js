@@ -50,6 +50,7 @@ class VerdictShortcuts extends Addon {
             if (!WindowManager.isHomeworkPage()) return;
             WindowManager.closeWindow();
             $(DECLINE_BUTTON_SELECTOR).first().click();
+
         });
         $(document).bind("keyup", ACCEPT_SHORTCUT, function() {
             if (!WindowManager.isHomeworkPage()) return;
@@ -246,11 +247,11 @@ class SingleFeed extends Addon {
                     works = [...works, ...workCouple.results];
                 }
                 works.sort(compareWorks);
-                waitForKeyElements(HOMEWORKS_BODY_SELECTOR, () => renderWorks(works));
+                renderWorks(works);
             });
         }
 
-        getAllCourses()
+        waitForKeyElements(HOMEWORKS_BODY_SELECTOR, getAllCourses);
     }
 }
 
