@@ -172,7 +172,15 @@ const COVER_PAGE_SHORTCUT = "alt+c";
 const CLICK_MERGE_SHORTCUT = "alt+m"
 ```
 
-#### OverviewShortcut (in progress)
+#### SubmitReviewShortcut
+
+Горячая клавиша для нажатия на кнопку Submit Review:
+
+```javascript
+const CLICK_SUBMIT_REVIEW = "alt+s";
+```
+
+#### OverviewShortcut
 
 Горячая клавиша для перемещения в Overview:
 
@@ -180,7 +188,7 @@ const CLICK_MERGE_SHORTCUT = "alt+m"
 const CLICK_OVERVIEW_SHORTCUT = "alt+o";
 ```
 
-#### ChangesShortcut (in progress)
+#### ChangesShortcut
 
 Горячая клавиша для перемещения в Changes:
 
