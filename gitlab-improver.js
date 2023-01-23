@@ -34,19 +34,25 @@ class MergeRequestShortcuts extends Addon {
         const CLICK_OVERVIEW_SHORTCUT = "alt+o";
         // Панель изменений
         const CLICK_CHANGES_SHORTCUT = "alt+c";
+        // Submit review
+        const CLICK_SUBMIT_REVIEW = "alt+s";
 
         const MERGE_SELECTOR = ".btn.accept-merge-request.btn-confirm";
         const OVERVIEW_SELECTOR = "a[data-action='show']";
         const CHANGES_SELECTOR = "a[data-action='diffs']";
+        const SUBMIT_SELECTOR = "button[data-qa-selector='submit_review_button']";
 
         $(document).bind("keyup", CLICK_MERGE_SHORTCUT, function() {
             $(MERGE_SELECTOR).first().click();
         });
-        $(document).bind("keyup", OVERVIEW_SELECTOR, function() {
-            $(OVERVIEW_SELECTOR).first().click();
+        $(document).bind("keyup", CLICK_OVERVIEW_SHORTCUT, function() {
+            window.location.href = $(OVERVIEW_SELECTOR).attr("href");
         });
-        $(document).bind("keyup", CHANGES_SELECTOR, function() {
-            $(CHANGES_SELECTOR).first().click();
+        $(document).bind("keyup", CLICK_CHANGES_SHORTCUT, function() {
+            window.location.href = $(CHANGES_SELECTOR).attr("href");
+        });
+        $(document).bind("keyup", CLICK_SUBMIT_REVIEW, function() {
+            $(SUBMIT_SELECTOR).first().click();
         });
     }
 }
