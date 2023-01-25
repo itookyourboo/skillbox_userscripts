@@ -175,6 +175,8 @@ class SingleFeed extends Addon {
         const HOMEWORKS_BODY_SELECTOR = ".homeworks__body";
         const CUSTOM_HOMEWORKS = "custom_homeworks";
 
+        let shown = false;
+
         function getAuthHeader() {
             return "Bearer " + localStorage.getItem("x-access-token");
         }
@@ -237,9 +239,12 @@ class SingleFeed extends Addon {
 
                 $(`.${CUSTOM_HOMEWORKS}`).append(card);
             }
+
+            shown = true;
         }
 
         function getAllCourses() {
+            if (shown) return;
             const URL = "https://go.skillbox.ru/api/v3/teachers/current/courses/check-statistics/?user_homework_status=wait";
             _fetch(URL).then(getAllWorks).then(data => {
                 let works = []
