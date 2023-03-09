@@ -108,6 +108,7 @@ class FileNavigationShortcuts extends Addon {
             $(INTERACTIVE_NODE_SELECTOR)
                 .filter(function() { return $(this).text() === fileName; })
                 .addClass(ACTIVE_NODE_CLASS);
+            (window.getSelection ? window.getSelection() : document.selection).empty();
         }
 
         function activateCodeScroller() { $(CODE_SCROLLER_SELECTOR).first().focus(); }
@@ -124,9 +125,9 @@ class HidePanelShortcuts extends Addon {
         const TOGGLE_PANEL_MENU_SHORTCUT = "m";
 
         // Селектор панели файлов
-        const PANEL_FILES_SELECTOR = ".css-1w81921";
+        const PANEL_FILES_SELECTOR = ".css-1lsajoe";
         // Селектор панели меню
-        const PANEL_MENU_SELECTOR = ".css-1klqaz2";
+        const PANEL_MENU_SELECTOR = ".css-1hoqhxr";
 
         $(document).bind("keyup", TOGGLE_PANEL_FILES_SHORTCUT, toggleFiles);
         $(document).bind("keyup", TOGGLE_PANEL_MENU_SHORTCUT, toggleSidePanel);
