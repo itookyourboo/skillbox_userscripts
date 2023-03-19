@@ -109,6 +109,7 @@ class FileNavigationShortcuts extends Addon {
                 .filter(function() { return $(this).text() === fileName; })
                 .addClass(ACTIVE_NODE_CLASS);
             (window.getSelection ? window.getSelection() : document.selection).empty();
+            activateCodeScroller();
         }
 
         function activateCodeScroller() { $(CODE_SCROLLER_SELECTOR).first().focus(); }
@@ -125,7 +126,7 @@ class HidePanelShortcuts extends Addon {
         const TOGGLE_PANEL_MENU_SHORTCUT = "m";
 
         // Селектор панели файлов
-        const PANEL_FILES_SELECTOR = ".css-1lsajoe";
+        const PANEL_FILES_SELECTOR = ".css-r7fush";
         // Селектор панели меню
         const PANEL_MENU_SELECTOR = ".css-1hoqhxr";
 
