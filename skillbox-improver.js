@@ -260,6 +260,9 @@ class SingleFeed extends Addon {
 class StatisticsSalary {
     name = "Расчет зарплаты"
     run() {
+        if (!WindowManager.isStatisticsPage()) {
+            return;
+        }
         const courses = {
             course: [
                 {id: "76618f54-7c44-4ef5-83a0-cd1f1fd7ba7c", name: "Python Basic 1", cost: 0},
