@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         SkillboxImprover
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.1
 // @description  Прокачка LMS Skillbox для проверяющих преподавателей
 // @author       wignorbo
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require      https://raw.githubusercontent.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @match        https://go.skillbox.ru/homeworks/*
+// @match        https://go.skillbox.ru/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=skillbox.ru
 // @grant        none
 // ==/UserScript==
@@ -23,6 +23,7 @@ function getRunningAddons() {
         new OpenHomeworkLinkShortcuts(),
         new ExpandCoursesShortcuts(),
         new SingleFeed(),
+        new StatisticsSalary(),
         // закомментируйте, если что-то не нужно
     ];
 }
@@ -175,8 +176,6 @@ class SingleFeed extends Addon {
         const HOMEWORKS_BODY_SELECTOR = ".homeworks__body";
         const CUSTOM_HOMEWORKS = "custom_homeworks";
 
-        let shown = false;
-
         function getAuthHeader() {
             return "Bearer " + localStorage.getItem("x-access-token");
         }
@@ -239,12 +238,10 @@ class SingleFeed extends Addon {
 
                 $(`.${CUSTOM_HOMEWORKS}`).append(card);
             }
-
-            shown = true;
         }
 
         function getAllCourses() {
-            if (shown) return;
+            if ($(`.${CUSTOM_HOMEWORKS}`).length) return;
             const URL = "https://go.skillbox.ru/api/v3/teachers/current/courses/check-statistics/?user_homework_status=wait";
             _fetch(URL).then(getAllWorks).then(data => {
                 let works = []
@@ -257,6 +254,72 @@ class SingleFeed extends Addon {
         }
 
         waitForKeyElements(HOMEWORKS_BODY_SELECTOR, getAllCourses);
+    }
+}
+
+class StatisticsSalary {
+    name = "Расчет зарплаты"
+    run() {
+        if (!WindowManager.isStatisticsPage()) {
+            return;
+        }
+        const courses = {
+            course: [
+                {id: "76618f54-7c44-4ef5-83a0-cd1f1fd7ba7c", name: "Python Basic 1", cost: 0},
+                {id: "68edfca7-fcb7-4934-a870-197b21ac338e", name: "Python Basic 2", cost: 0},
+                {id: "45fd58aa-cb50-4db5-98d4-bcec538aa95f", name: "Python для Data Science", cost: 0},
+                {id: "2e3a7d66-6c76-4acc-8aa9-5e33b658715f", name: "ДПО Python Basic", cost: 0},
+                {id: "fa92a81c-a475-4119-8828-edbcca2f2588", name: "Python Advanced", cost: 0},
+            ],
+            diploma: [
+                {id: "fdbd7d99-0d58-4370-8421-dda6c07a6b07", name: "Python Basic 1", cost: 0},
+                {id: "f03f29ed-8e9f-4318-9f25-c2c3738700c1", name: "Python Basic 2", cost: 0},
+                {id: "6734cb2e-813c-4fe0-9785-1349dac4d76b", name: "Python Basic 2 (2022)", cost: 0},
+                {id: "63f99248-ebe7-46d9-a108-0416c21dcd06", name: "ДПО Python Basic", cost: 0},
+                {id: "5c8085ac-52d2-406f-ab21-889dc1ee488b", name: "Python Advanced", cost: 0},
+            ]
+        }
+
+        function getAuthHeader() {
+            return "Bearer " + localStorage.getItem("x-access-token");
+        }
+
+        async function getCourseStat(type, id) {
+            const response = await fetch("https://go.skillbox.ru/api/v3/teachers/statistics/chart/", {
+                method: "POST",
+                headers: {
+                    "X-Auth": getAuthHeader(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    courses_ids: [
+                        id
+                    ],
+                    course_type: type,
+                    period: "this_month"
+                })
+            });
+            const data = await response.json();
+            return data.totals;
+        }
+
+        const promises = []
+
+        for (const courseType in courses) {
+            for (const course of courses[courseType]) {
+                promises.push(getCourseStat(courseType, course.id)
+                    .then(data => {
+                        return {type: courseType, salary: data.accepted * course.cost, ...course, ...data}
+                    }));
+            }
+        }
+
+        Promise.all(promises)
+            .then(result => { result.sort((a, b) => b.salary - a.salary); return result; })
+            .then(result => { console.table(result, [
+                "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
+            ]); return result; })
+            .then(result => { console.log("Итого: ", result.map(x => x.salary).reduce((a, b) => a + b)) });
     }
 }
 
@@ -291,7 +354,8 @@ class WindowManager {
     }
 
     static isMainPage() { return window.location.href.includes("next"); }
-    static isHomeworkPage() { return !this.isMainPage(); }
+    static isHomeworkPage() { return window.location.href.includes("/homeworks"); }
+    static isStatisticsPage() { return window.location.href.includes("/statistic"); }
     static focusInputField() {
         const INPUT_FIELD_SELECTOR = ".fr-element.fr-view";
         $(INPUT_FIELD_SELECTOR).first().focus();
