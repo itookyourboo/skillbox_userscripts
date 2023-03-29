@@ -104,6 +104,36 @@ const EXPAND_NEXT_SHORTCUT = "alt+down";
 
 ![](assets/Skillbox_SinglePage.jpg)
 
+### StatisticsSalary
+
+Вывод в консоль сводной таблицы по проверкам с учетом ставки для отображения зарплаты.
+
+![](assets/Skillbox_StatisticsSalary.jpg)
+
+Конфигурация курсов и ставок происходит в классе `StatisticsSalary`:
+
+```javascript
+const courses = {
+   course: [
+       {id: "76618f54-7c44-4ef5-83a0-cd1f1fd7ba7c", name: "Python Basic 1", cost: 0},
+       {id: "68edfca7-fcb7-4934-a870-197b21ac338e", name: "Python Basic 2", cost: 0},
+       {id: "45fd58aa-cb50-4db5-98d4-bcec538aa95f", name: "Python для Data Science", cost: 0},
+       {id: "2e3a7d66-6c76-4acc-8aa9-5e33b658715f", name: "ДПО Python Basic", cost: 0},
+       {id: "fa92a81c-a475-4119-8828-edbcca2f2588", name: "Python Advanced", cost: 0},
+   ],
+   diploma: [
+       {id: "fdbd7d99-0d58-4370-8421-dda6c07a6b07", name: "Python Basic 1", cost: 0},
+       {id: "f03f29ed-8e9f-4318-9f25-c2c3738700c1", name: "Python Basic 2", cost: 0},
+       {id: "6734cb2e-813c-4fe0-9785-1349dac4d76b", name: "Python Basic 2 (2022)", cost: 0},
+       {id: "63f99248-ebe7-46d9-a108-0416c21dcd06", name: "ДПО Python Basic", cost: 0},
+       {id: "5c8085ac-52d2-406f-ab21-889dc1ee488b", name: "Python Advanced", cost: 0},
+   ]
+}
+```
+
+В `id` указывается ID курса, в `name` - его название для отображения в таблице, в `cost` - ставка за принятую работу.
+
+
 ## ReplitImprover
 
 Скрипт для прокачки Replit.
