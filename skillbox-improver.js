@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         SkillboxImprover
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Прокачка LMS Skillbox для проверяющих преподавателей
 // @author       wignorbo
-// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require      https://raw.githubusercontent.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
 // @match        https://go.skillbox.ru/*
@@ -171,7 +171,8 @@ class ExpandCoursesShortcuts extends Addon {
 }
 
 class SingleFeed extends Addon {
-    name = "Единая лента для всех работ"
+    name = "Единая лента для всех работ";
+
     run() {
         const HOMEWORKS_BODY_SELECTOR = ".homeworks__body";
         const CUSTOM_HOMEWORKS = "custom_homeworks";
@@ -258,7 +259,8 @@ class SingleFeed extends Addon {
 }
 
 class StatisticsSalary {
-    name = "Расчет зарплаты"
+    name = "Расчет зарплаты";
+
     run() {
         if (!WindowManager.isStatisticsPage()) {
             return;
@@ -284,7 +286,7 @@ class StatisticsSalary {
             return "Bearer " + localStorage.getItem("x-access-token");
         }
 
-        async function getCourseStat(type, id) {
+        async function getCourseStat(type, id, period="this_month") {
             const response = await fetch("https://go.skillbox.ru/api/v3/teachers/statistics/chart/", {
                 method: "POST",
                 headers: {
@@ -296,30 +298,41 @@ class StatisticsSalary {
                         id
                     ],
                     course_type: type,
-                    period: "this_month"
+                    period: period
                 })
             });
             const data = await response.json();
             return data.totals;
         }
 
-        const promises = []
+        function generateSalaryTable(period="this_month") {
+            const promises = []
 
-        for (const courseType in courses) {
-            for (const course of courses[courseType]) {
-                promises.push(getCourseStat(courseType, course.id)
-                    .then(data => {
+            for (const courseType in courses) {
+                for (const course of courses[courseType]) {
+                    promises.push(getCourseStat(courseType, course.id, period)
+                                  .then(data => {
                         return {type: courseType, salary: data.accepted * course.cost, ...course, ...data}
                     }));
+                }
             }
-        }
 
-        Promise.all(promises)
-            .then(result => { result.sort((a, b) => b.salary - a.salary); return result; })
-            .then(result => { console.table(result, [
-                "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
-            ]); return result; })
-            .then(result => { console.log("Итого: ", result.map(x => x.salary).reduce((a, b) => a + b)) });
+            Promise.all(promises)
+                .then(result => {
+                    result.sort((a, b) => b.salary - a.salary);
+                    return result;
+                }).then(result => {
+                    console.log(`Период: ${period}`)
+                    console.table(result, [
+                        "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
+                    ]);
+                    return result;
+                }).then(result => {
+                    console.log("Итого: ", result.map(x => x.salary).reduce((a, b) => a + b))
+                });
+        }
+        generateSalaryTable("today");
+        generateSalaryTable("this_month");
     }
 }
 
