@@ -317,22 +317,45 @@ class StatisticsSalary {
                 }
             }
 
+            function sum(data, argName) {
+                return data.map(x => x[argName]).reduce((a, b) => a + b);
+            }
+
             Promise.all(promises)
                 .then(result => {
                     result.sort((a, b) => b.salary - a.salary);
+                    result.push({
+                        type: "ИТОГО",
+                        salary: sum(result, "salary"),
+                        name: "-",
+                        cost: "-",
+                        iterations: sum(result, "iterations"),
+                        accepted: sum(result, "accepted"),
+                        on_time_iterations: sum(result, "on_time_iterations")
+                    })
                     return result;
                 }).then(result => {
                     console.log(`Период: ${period}`)
                     console.table(result, [
                         "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
                     ]);
-                    return result;
-                }).then(result => {
-                    console.log("Итого: ", result.map(x => x.salary).reduce((a, b) => a + b))
                 });
         }
-        generateSalaryTable("today");
-        generateSalaryTable("this_month");
+
+        const periods = [
+            "today",
+            // "yesterday",
+            // "this_week",
+            // "past_7_days",
+            "this_month",
+            // "last_month",
+            // "past_6_months",
+            "past_year"
+        ];
+
+        for (const period of periods) {
+            generateSalaryTable(period);
+        }
     }
 }
 
