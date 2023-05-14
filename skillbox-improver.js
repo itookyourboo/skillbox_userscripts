@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SkillboxImprover
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Прокачка LMS Skillbox для проверяющих преподавателей
 // @author       wignorbo
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -302,24 +302,58 @@ class StatisticsSalary {
             const data = await response.json();
             return data.totals;
         }
+        
+        function generateSalaryTable(period="this_month") {
+            const promises = []
 
-        const promises = []
-
-        for (const courseType in courses) {
-            for (const course of courses[courseType]) {
-                promises.push(getCourseStat(courseType, course.id)
-                    .then(data => {
+            for (const courseType in courses) {
+                for (const course of courses[courseType]) {
+                    promises.push(getCourseStat(courseType, course.id, period)
+                                  .then(data => {
                         return {type: courseType, salary: data.accepted * course.cost, ...course, ...data}
                     }));
+                }
             }
+
+            function sum(data, argName) {
+                return data.map(x => x[argName]).reduce((a, b) => a + b);
+            }
+
+            Promise.all(promises)
+                .then(result => {
+                    result.sort((a, b) => b.salary - a.salary);
+                    result.push({
+                        type: "ИТОГО",
+                        salary: sum(result, "salary"),
+                        name: "-",
+                        cost: "-",
+                        iterations: sum(result, "iterations"),
+                        accepted: sum(result, "accepted"),
+                        on_time_iterations: sum(result, "on_time_iterations")
+                    })
+                    return result;
+                }).then(result => {
+                    console.log(`Период: ${period}`)
+                    console.table(result, [
+                        "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
+                    ]);
+                });
         }
 
-        Promise.all(promises)
-            .then(result => { result.sort((a, b) => b.salary - a.salary); return result; })
-            .then(result => { console.table(result, [
-                "type", "name", "iterations", "on_time_iterations", "cost", "accepted", "salary"
-            ]); return result; })
-            .then(result => { console.log("Итого: ", result.map(x => x.salary).reduce((a, b) => a + b)) });
+        const periods = [
+            "today",
+            // "yesterday",
+            // "this_week",
+            // "past_7_days",
+            "this_month",
+            // "last_month",
+            // "past_6_months",
+            "past_year"
+        ];
+
+        for (const period of periods) {
+            generateSalaryTable(period);
+        }
     }
 }
 
